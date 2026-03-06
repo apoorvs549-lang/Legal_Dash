@@ -1,0 +1,94 @@
+# Local Development & Deployment Workflow
+
+This guide explains how to make changes on your own computer, test them locally, and then deploy them to the live EC2 server using the automated CI/CD pipeline we set up.
+
+---
+
+## 💻 1. How to Run the App Locally
+
+To see your changes immediately as you code, you need to run all 3 parts of the app (Database, Backend, Frontend) on your computer.
+
+### Step A: Start the Database Locally
+You can use Docker to run just the database on your machine exactly as it runs in production.
+
+1. Open PowerShell in your project folder (`C:\Users\apoor\Desktop\reactdashboard`).
+2. Start the database container:
+   ```powershell
+   docker-compose up db -d
+   ```
+   *This starts PostgreSQL on port 5433 using the credentials in your `server/.env` file.*
+
+### Step B: Start the Backend (Fastify)
+The backend runs in "watch mode" using `nodemon`, meaning it automatically restarts when you save a file.
+
+1. Open a **second** PowerShell window.
+2. Go to the server folder and start it:
+   ```powershell
+   cd C:\Users\apoor\Desktop\reactdashboard\server
+   npm run dev
+   ```
+   *The backend is now running at `http://localhost:3000`.*
+
+### Step C: Start the Frontend (React/Vite)
+The frontend also runs in watch mode and connects to your local backend.
+
+1. Open a **third** PowerShell window.
+2. Go to the project root and start Vite:
+   ```powershell
+   cd C:\Users\apoor\Desktop\reactdashboard
+   npm run dev
+   ```
+   *The frontend is now running at `http://localhost:5173`. Open this URL in your browser.*
+
+> ✅ You can now make changes to React or Fastify files. When you save, the browser updates instantly!
+
+---
+
+## 🚀 2. How to Deploy Your Changes
+
+Once you are happy with how your changes look on `localhost`, it's time to send them to the live website.
+
+Because we set up GitHub Actions CI/CD, the deployment process is identical to a standard Git workflow. **You do not need to touch the EC2 server or run any Docker commands.**
+
+### The 3-Step Deploy Process
+
+In your terminal (in the project folder), run these 3 commands:
+
+```powershell
+# 1. Stage your changes
+git add .
+
+# 2. Commit your changes with a descriptive message
+git commit -m "feat: added new button to dashboard"
+
+# 3. Push to GitHub
+git push origin main
+```
+
+### What Happens Next?
+The moment you run `git push`, the CI/CD pipeline automatically takes over:
+1. GitHub servers download your new code.
+2. GitHub builds fresh Docker images for your Frontend and Backend.
+3. GitHub pushes those images to the GitHub Container Registry.
+4. GitHub logs into your EC2 server via SSH.
+5. EC2 pulls the new images and restarts the containers.
+
+Your live site (`http://13.63.65.240`) will be updated automatically within **~1 to 2 minutes**.
+
+---
+
+## 🔍 3. Verifying the Deployment
+
+You can watch the deployment happen in real-time on GitHub:
+
+1. Go to your repository on GitHub.
+2. Click the **Actions** tab at the top.
+3. You will see your latest commit message with a yellow spinning circle (in progress) or a green checkmark (done).
+4. Once it's green, go to `http://13.63.65.240` and hard refresh (`Ctrl + Shift + R`) to see your new live changes.
+
+---
+
+## ⚠️ Important Rules for Local Dev
+
+1. **Never change API URLs explicitly in code.** The code is designed to work both locally and in production. The Vite build process (`docker-compose.yml`) injects the production IP automatically.
+2. **Database Changes:** If you change database models in `server/models/`, Sequelize will sync them automatically when the backend restarts. However, be careful with destructive changes (like deleting columns) as `alter: true` might drop data.
