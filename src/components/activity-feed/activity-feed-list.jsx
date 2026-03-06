@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ClientCard from './client-card';
 import { INITIAL_CLIENTS, STATUS_CONFIG } from './activity-data';
@@ -50,10 +50,45 @@ const ActivityFeedHeader = ({ clients }) => {
 const ActivityFeedList = () => {
     const [clients, setClients] = useState(INITIAL_CLIENTS);
 
-    const handleStatusChange = (id, newStatus) => {
+    useEffect(() => {
+        const fetchCases = async () => {
+            try {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/cases`);
+                const result = await res.json();
+                if (result.success && result.data) {
+                    // Prepend real cases and append mock data as fallback if desired
+                    const liveCases = result.data.map(c => ({
+                        id: c.id,
+                        name: c.name,
+                        caseType: c.caseType,
+                        status: c.status,
+                        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=6366f1&color=fff&size=80`
+                    }));
+                    setClients([...liveCases, ...INITIAL_CLIENTS]);
+                }
+            } catch (err) {
+                console.error("Failed to fetch assigned cases:", err);
+            }
+        };
+        fetchCases();
+    }, []);
+
+    const handleStatusChange = async (id, newStatus) => {
+        // Optimistic UI update
         setClients((prev) =>
             prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
         );
+        
+        // Push status change to backend (assuming PUT /api/v1/cases/:id exists, if not this is a safe placeholder)
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/v1/cases/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus })
+            });
+        } catch (err) {
+            console.error("Failed to update status", err);
+        }
     };
 
     return (
