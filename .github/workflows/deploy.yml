@@ -17,6 +17,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 10m
           script: |
             set -e
 
@@ -26,9 +27,14 @@ jobs:
             echo "⬇️  Pulling latest code from GitHub..."
             git pull origin main
 
-            echo "🔨 Rebuilding Docker images and restarting containers..."
+            echo "🔨 Stopping old containers..."
             docker-compose down
-            docker-compose up --build -d
+
+            echo "🔨 Rebuilding images (no cache to pick up latest code)..."
+            docker-compose build --no-cache
+
+            echo "🚀 Starting containers..."
+            docker-compose up -d
 
             echo "✅ Deploy complete! Containers running:"
             docker-compose ps
