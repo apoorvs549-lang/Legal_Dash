@@ -47,7 +47,7 @@
 
 ## 🔁 Redeploying After Code Changes
 
-Follow these steps every time you update your code and want to redeploy.
+Follow steps every time you update your code and want to redeploy.
 
 ---
 
