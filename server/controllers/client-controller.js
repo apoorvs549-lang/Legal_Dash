@@ -3,10 +3,17 @@ import * as clientService from '../services/client-service.js';
 
 const createClientSchema = z.object({
     name: z.string().min(1, 'Client name is required').max(255),
+    email: z.string().email('Invalid email').optional().or(z.literal('')),
+    phone: z.string().optional(),
+    dob: z.string().optional(),
+    address: z.string().optional(),
     caseType: z.enum([
         'Personal Injury', 'Family Law', 'Criminal Defense', 'Employment Law',
         'Real Estate', 'Estate Planning', 'Business Litigation', 'Immigration', 'Other',
     ], { errorMap: () => ({ message: 'Invalid case type' }) }),
+    caseDescription: z.string().optional(),
+    incidentDate: z.string().optional(),
+    opposingParty: z.string().optional(),
     status: z.enum(['Active', 'Review', 'Closed']).default('Active'),
 });
 

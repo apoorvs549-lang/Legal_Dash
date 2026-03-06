@@ -13,10 +13,41 @@ const Client = sequelize.define('Client', {
         allowNull: false,
         validate: { notEmpty: { msg: 'Client name cannot be empty' } },
     },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    dob: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    address: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
     caseType: {
         type: DataTypes.STRING,
         allowNull: false,
         field: 'case_type',
+    },
+    caseDescription: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        field: 'case_description',
+    },
+    incidentDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        field: 'incident_date',
+    },
+    opposingParty: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'opposing_party',
     },
     status: {
         type: DataTypes.STRING,

@@ -6,14 +6,21 @@ import Client from '../models/client-model.js';
  * @returns {Promise<Client>}
  */
 export async function createClient(fields) {
-    const { name, caseType, status } = fields;
+    const { name, email, phone, dob, address, caseType, caseDescription, incidentDate, opposingParty, status } = fields;
 
     if (!name) throw new Error('Client name is required');
     if (!caseType) throw new Error('Case type is required');
 
     const client = await Client.create({
         name,
+        email,
+        phone,
+        dob: dob || null,
+        address,
         caseType,
+        caseDescription,
+        incidentDate: incidentDate || null,
+        opposingParty,
         status: status || 'Active',
         dateAdded: new Date(),
     });

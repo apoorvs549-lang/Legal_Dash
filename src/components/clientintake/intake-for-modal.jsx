@@ -77,7 +77,14 @@ function IntakeFormModal({ onClose, onClientCreated }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     name: formData.fullName,
+                    email: formData.email,
+                    phone: formData.phone,
+                    dob: formData.dob,
+                    address: formData.address,
                     caseType: formData.caseType,
+                    caseDescription: formData.caseDescription,
+                    incidentDate: formData.incidentDate,
+                    opposingParty: formData.opposingParty,
                     status: "Active",
                 }),
             });
