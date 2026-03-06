@@ -27,9 +27,7 @@ services:
   # SERVICE 2: Fastify Backend Server
   # ─────────────────────────────────────────────────
   backend:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
+    image: ghcr.io/apoorvs549-lang/legal-dash-backend:latest
     container_name: reactdash_backend
     restart: always
     ports:
@@ -55,11 +53,7 @@ services:
   # SERVICE 3: React Frontend (Nginx)
   # ─────────────────────────────────────────────────
   frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: http://13.63.65.240:3000
+    image: ghcr.io/apoorvs549-lang/legal-dash-frontend:latest
     container_name: reactdash_frontend
     restart: always
     ports:
