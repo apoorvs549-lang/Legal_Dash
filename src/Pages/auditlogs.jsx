@@ -5,7 +5,7 @@ import AuditTable from '../components/auditlogs/audit/audit-table.jsx';
 import FiltersPanel from '../components/auditlogs/audit/filter-panel.jsx';
 import Pagination from '../components/auditlogs/audit/pagination.jsx';
 import StatsGrid from '../components/auditlogs/audit/stats-grid.jsx';
-import ErrorState from '../components/ui/ErrorState.jsx';
+import ErrorState from '../components/ui/errorstate.jsx';
 
 const Auditlogs = () => {
     const { logs, pagination, filters, loading, error, updateFilters, refresh } = useAuditLogs();
