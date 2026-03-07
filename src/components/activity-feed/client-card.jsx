@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Trash2 } from 'lucide-react';
 import ProgressBar from './progress-bar';
 import { STATUS_STEPS, STATUS_CONFIG } from './activity-data';
 
@@ -24,7 +24,7 @@ const imageVariants = {
     },
 };
 
-const ClientCard = ({ client, index, onStatusChange }) => {
+const ClientCard = ({ client, index, onStatusChange, onDelete }) => {
     const [selectedStatus, setSelectedStatus] = useState('');
     const [showImage, setShowImage] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -87,10 +87,22 @@ const ClientCard = ({ client, index, onStatusChange }) => {
                         </div>
                     </button>
 
-                    {/* Case Type Badge */}
-                    <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-500">
-                        {client.caseType}
-                    </span>
+                    {/* Case Type Badge & Delete Actions */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-500">
+                            {client.caseType}
+                        </span>
+                        
+                        <motion.button
+                            whileHover={{ scale: 1.1, backgroundColor: '#fee2e2', color: '#dc2626' }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => onDelete(client.id)}
+                            className="p-1.5 rounded-md text-slate-400 hover:text-red-500 transition-colors bg-white outline-none"
+                            title="Delete Case from Activity Feed"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </motion.button>
+                    </div>
                 </div>
 
                 {/* Expanded Avatar Image (on click) */}

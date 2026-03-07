@@ -46,3 +46,15 @@ export async function getClientById(id) {
     if (!client) throw new Error(`Client with id ${id} not found`);
     return client;
 }
+
+/**
+ * Mark a client's case as taken.
+ * @param {string} id
+ * @returns {Promise<Client>}
+ */
+export async function takeClientCase(id) {
+    const client = await getClientById(id);
+    client.isTaken = true;
+    await client.save();
+    return client;
+}

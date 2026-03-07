@@ -30,3 +30,12 @@ export async function getAssignedCaseById(id) {
     if (!assignedCase) throw new Error(`Case with id ${id} not found`);
     return assignedCase;
 }
+
+/**
+ * Delete a single assigned case by UUID.
+ */
+export async function deleteAssignedCase(id) {
+    const assignedCase = await getAssignedCaseById(id);
+    await assignedCase.destroy();
+    return true;
+}

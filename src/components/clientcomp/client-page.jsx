@@ -5,13 +5,14 @@ import { useState } from "react";
 // ── Take Case Button ─────────────────────────────────────────
 // States: "idle" → "loading" → "done"
 const TakeCaseBtn = ({ client }) => {
-  const [state, setState] = useState("idle");
+  const [state, setState] = useState(client.isTaken ? "done" : "idle");
 
   const handleClick = async () => {
     if (state !== "idle") return;
     setState("loading");
     
     try {
+      // 1. Add to activity feed
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/cases`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,7 +23,14 @@ const TakeCaseBtn = ({ client }) => {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create case");
+      if (!res.ok) throw new Error("Failed to create case in activity feed");
+
+      // 2. Mark permanently as taken in the Client Registry db
+      await fetch(`${import.meta.env.VITE_API_URL}/api/v1/clients/${client.id}/take`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}) // Fastify requires a body for application/json
+      });
       
       setState("done");
     } catch (error) {

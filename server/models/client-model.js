@@ -60,6 +60,12 @@ const Client = sequelize.define('Client', {
         field: 'date_added',
         defaultValue: DataTypes.NOW,
     },
+    isTaken: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+        field: 'is_taken',
+    },
 }, {
     tableName: 'clients_registry',
     timestamps: true,

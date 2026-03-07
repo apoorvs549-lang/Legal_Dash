@@ -21,4 +21,10 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Environment Variables and Credentials
+.env
+.env.*
+!.env.example
+*.pem
+credentials.json
+*.key

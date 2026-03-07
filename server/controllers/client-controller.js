@@ -89,3 +89,24 @@ export async function getClientById(request, reply) {
         });
     }
 }
+
+/**
+ * PUT /api/v1/clients/:id/take
+ */
+export async function takeClientCase(request, reply) {
+    try {
+        const { id } = request.params;
+        const client = await clientService.takeClientCase(id);
+        return reply.send({ success: true, message: 'Case taken successfully', data: client });
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return reply.code(404).send({ success: false, message: error.message });
+        }
+        request.log.error(error);
+        return reply.code(500).send({
+            success: false,
+            message: 'Failed to take client case',
+            error: error.message,
+        });
+    }
+}

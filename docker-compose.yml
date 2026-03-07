@@ -27,6 +27,8 @@ services:
   # SERVICE 2: Fastify Backend Server
   # ─────────────────────────────────────────────────
   backend:
+  #forget to add build thats why instead of building new code it was pointing to old pre-built version of github
+    build: ./server   
     image: ghcr.io/apoorvs549-lang/legal-dash-backend:latest
     container_name: reactdash_backend
     restart: always
@@ -45,6 +47,14 @@ services:
       CORS_ORIGIN: http://13.63.65.240
     volumes:
       - ./server/uploads:/usr/src/app/uploads
+
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: eu-north-1
+        awslogs-group: /reactdashboard/backend
+        awslogs-stream: backend-server
+        awslogs-create-group: "true"
     depends_on:
       db:
         condition: service_healthy

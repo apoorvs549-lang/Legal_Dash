@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import ClientCard from './client-card';
-import { INITIAL_CLIENTS, STATUS_CONFIG } from './activity-data';
+import { STATUS_CONFIG } from './activity-data';
 
 const ActivityFeedHeader = ({ clients }) => {
     const stats = [
@@ -48,7 +48,7 @@ const ActivityFeedHeader = ({ clients }) => {
 };
 
 const ActivityFeedList = () => {
-    const [clients, setClients] = useState(INITIAL_CLIENTS);
+    const [clients, setClients] = useState([]);
 
     useEffect(() => {
         const fetchCases = async () => {
@@ -64,7 +64,7 @@ const ActivityFeedList = () => {
                         status: c.status,
                         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=6366f1&color=fff&size=80`
                     }));
-                    setClients([...liveCases, ...INITIAL_CLIENTS]);
+                    setClients(liveCases);
                 }
             } catch (err) {
                 console.error("Failed to fetch assigned cases:", err);
@@ -91,6 +91,21 @@ const ActivityFeedList = () => {
         }
     };
 
+    const handleDelete = async (id) => {
+        // Optimistic UI update for immediate snapping
+        setClients((prev) => prev.filter((c) => c.id !== id));
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/cases/${id}`, {
+                method: "DELETE"
+            });
+            if (!res.ok) throw new Error("Failed to delete case from database");
+        } catch (err) {
+            console.error("Failed to delete case:", err);
+            // Optionally, we could re-fetch cases here if the delete failed
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8 rounded-xl shadow-sm">
             <div className="max-w-4xl mx-auto">
@@ -103,6 +118,7 @@ const ActivityFeedList = () => {
                             client={client}
                             index={i}
                             onStatusChange={handleStatusChange}
+                            onDelete={handleDelete}
                         />
                     ))}
                 </div>

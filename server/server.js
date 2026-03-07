@@ -58,6 +58,7 @@ fastify.register(fastifyStatic, {
 // CORS – allow the Vite dev server (usually port 5173) with credentials
 fastify.register(cors, {
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: true,
 });
 
@@ -75,6 +76,7 @@ fastify.register(activityFeedRoutes, { prefix: '/api/v1/cases' });
 // Health Check 
 
 fastify.get('/health', async () => {
+    fastify.log.info('🌟 CLOUDWATCH VERIFICATION: The /health endpoint was accessed! If you see this in AWS, it is working perfectly!');
     return { status: 'ok', timestamp: new Date().toISOString() };
 });
 

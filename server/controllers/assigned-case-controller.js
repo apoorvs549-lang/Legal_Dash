@@ -79,3 +79,30 @@ export async function getAssignedCaseById(request, reply) {
         });
     }
 }
+
+/**
+ * DELETE /api/v1/cases/:id
+ */
+export async function deleteAssignedCase(request, reply) {
+    try {
+        const { id } = request.params;
+        await assignedCaseService.deleteAssignedCase(id);
+        return reply.send({
+            success: true,
+            message: 'Case deleted perfectly',
+        });
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return reply.code(404).send({
+                success: false,
+                message: error.message,
+            });
+        }
+        request.log.error(error);
+        return reply.code(500).send({
+            success: false,
+            message: 'Failed to delete case',
+            error: error.message,
+        });
+    }
+}

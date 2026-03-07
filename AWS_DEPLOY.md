@@ -45,6 +45,30 @@
 
 ---
 
+## ☁️ Setting Up CloudWatch Logs (Required Once)
+
+We have configured the Docker `backend` to push logs directly to AWS CloudWatch. To allow the EC2 instance to do this, you must attach an IAM Role to your EC2 instance.
+
+### Step 1 — Create an IAM Role for EC2
+1. Go to **AWS Console → IAM → Roles**.
+2. Click **Create role**.
+3. Select **AWS service** as the trusted entity type, and choose **EC2** from the list of services. Click Next.
+4. On the Permissions page, search for `CloudWatchLogsFullAccess` and select the checkbox next to it. Click Next.
+   *(Note: For stricter security, you can create a custom policy with just `logs:CreateLogGroup`, `logs:CreateLogStream`, and `logs:PutLogEvents`)*.
+5. Give the role a name like `EC2-CloudWatchLogs-Role` and click **Create role**.
+
+### Step 2 — Attach the Role to Your EC2 Instance
+1. Go to **AWS Console → EC2 → Instances**.
+2. Select your running instance.
+3. Click **Actions → Security → Modify IAM role**.
+4. Choose the `EC2-CloudWatchLogs-Role` you just created from the dropdown.
+5. Click **Update IAM role**.
+
+> ✅ Your EC2 instance can now securely send Docker logs to CloudWatch without needing hardcoded AWS credentials in your codebase!
+> *(The region is currently set to `ap-south-1` in `docker-compose.yml`. Change it if your EC2 instance is in a different region).*
+
+---
+
 ## 🔁 Redeploying After Code Changes
 
 Follow steps every time you update your code and want to redeploy.
@@ -56,7 +80,7 @@ Follow steps every time you update your code and want to redeploy.
 Open a terminal (PowerShell or VS Code terminal) and run:
 
 ```powershell
-ssh -i "C:\Users\apoor\Downloads\apoorv.pem" ec2-user@13.63.36.252
+ssh -i "C:\Users\apoor\Downloads\apoorv.pem" ec2-user@13.63.65.240
 ```
 
 You should see: `[ec2-user@ip-172-31-27-194 ~]$`
@@ -71,7 +95,7 @@ Open a **new local PowerShell** and run:
 
 ```powershell
 cd C:\Users\apoor\Desktop\reactdashboard
-$env:VITE_API_URL = "http://13.63.36.252:3000"
+$env:VITE_API_URL = "http://13.63.65.240:3000"
 npm run build
 ```
 
@@ -84,7 +108,7 @@ This creates/updates the `dist/` folder with your latest code.
 Still in your **local PowerShell**, run:
 
 ```powershell
-scp -i "C:\Users\apoor\Downloads\apoorv.pem" -r "C:\Users\apoor\Desktop\reactdashboard\dist\*" ec2-user@13.63.36.252:~/reactdashboard/dist/
+scp -i "C:\Users\apoor\Downloads\apoorv.pem" -r "C:\Users\apoor\Desktop\reactdashboard\dist\*" ec2-user@13.63.65.240:~/reactdashboard/dist/
 ```
 
 > This only transfers compiled static files — fast (a few seconds).
@@ -100,7 +124,7 @@ Only needed if you changed backend code in the `server/` folder:
 Compress-Archive -Path "C:\Users\apoor\Desktop\reactdashboard\server\*" -DestinationPath "C:\Users\apoor\Desktop\server.zip" -Force
 
 # Transfer the zip
-scp -i "C:\Users\apoor\Downloads\apoorv.pem" "C:\Users\apoor\Desktop\server.zip" ec2-user@13.63.36.252:~/reactdashboard/server.zip
+scp -i "C:\Users\apoor\Downloads\apoorv.pem" "C:\Users\apoor\Desktop\server.zip" ec2-user@13.63.65.240:~/reactdashboard/server.zip
 ```
 
 Then on **EC2 SSH terminal**:
@@ -151,7 +175,7 @@ Expected output — all three should be `Up`:
 
 ### STEP 7 — Open in Browser
 
-Visit: **http://13.48.177.45**
+Visit: **http://13.63.65.240**
 
 Hard refresh with `Ctrl + Shift + R` to clear browser cache.
 
@@ -190,9 +214,9 @@ df -h
 
 | Service | URL |
 |---------|-----|
-| Frontend (React) | http://13.63.36.252 |
-| Backend API | http://13.63.36.252:3000 |
-| Backend Health | http://13.63.36.252:3000/api/v1/health |
+| Frontend (React) | http://13.63.65.240 |
+| Backend API | http://13.63.65.240:3000 |
+| Backend Health | http://13.63.65.240:3000/api/v1/health |
 
 ---
 
@@ -263,7 +287,8 @@ cd ~/reactdashboard
 docker-compose up -d
 ```
 
-> If you set up an Elastic IP (above), the IP stays the same and your app is immediately back at **http://13.63.36.252** after starting containers.
+> If you set up an Elastic IP (above), the IP stays the same and your app is immediately back at **http://13.63.65.240** after starting containers.
 > If you did NOT set up an Elastic IP, go to EC2 → Instances → copy the new **Public IPv4 address** and use that instead.
 
 ### ❌ Never click "Terminate" — that permanently deletes everything!
+
