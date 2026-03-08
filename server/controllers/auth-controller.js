@@ -20,7 +20,7 @@ const signupSchema = loginSchema.extend({
  */
 const COOKIE_OPTIONS = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: false,   // Must be false for HTTP deployments; set true only when HTTPS is configured
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60, // 7 days in seconds

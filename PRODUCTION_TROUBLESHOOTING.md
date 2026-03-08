@@ -33,3 +33,13 @@ Here is a simple but detailed breakdown of every issue we faced, why it happened
 - **The Problem:** After successfully building the frontend, attempting to upload a document resulted in a red "failed to fetch data" network network error in the browser.
 - **The Root Cause:** By diving into the backend server logs using `docker logs reactdash_backend`, we found a fatal crash loop: `SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string`. The `docker-compose.yml` file is designed to read passwords from the host machine using variables like `${DB_PASSWORD}`. However, the AWS EC2 machine was entirely blank—it didn't know the password! Because the backend booted up with an empty password, it could not authenticate with the PostgreSQL database. Since the backend was permanently crashed, all API requests from the frontend simply "failed to fetch".
 - **The Fix:** We used the Linux terminal to create a secure, hidden `.env` file directly on the AWS Server (`~/reactdashboard/.env`). Inside it, we defined the real `POSTGRES_PASSWORD`, `DB_PASSWORD`, and `JWT_SECRET`. Upon restarting Docker, it automatically loaded these variables into the containers, seamlessly connecting the backend to the live production database.
+
+---
+
+## 4. Case Status Not Syncing with Database
+**One-liner solution:** Implemented the missing `PUT /api/v1/cases/:id` backend route, service, and controller to persist the frontend's status change requests to PostgreSQL.
+
+**Detailed Explanation:**
+- **The Problem:** When clicking the status buttons on the Activity Feed (e.g., moving a case from "Pending" to "In Progress"), the UI immediately updated, but refreshing the page revealed that the database never saved the updated status.
+- **The Root Cause:** The frontend correctly sent a `PUT` network request with the new status data. However, the backend's `activity-feed-routes.js` lacked a route listener for `PUT` requests! Because the route didn't exist, Fastify returned a `404 Not Found` response. The frontend silently ignored this error and kept showing its "optimistic" UI update as if the database save had succeeded.
+- **The Fix:** We authored the missing backend logic: an `updateAssignedCase` service function that locates and modifies the database row, an `updateAssignedCase` controller function to validate input, and finally wired it into `activity-feed-routes.js` with `fastify.put()`.
