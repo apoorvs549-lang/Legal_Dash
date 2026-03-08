@@ -32,6 +32,15 @@ export async function getAssignedCaseById(id) {
 }
 
 /**
+ * Update the status of an assigned case by UUID.
+ */
+export async function updateAssignedCase(id, fields) {
+    const assignedCase = await getAssignedCaseById(id);
+    await assignedCase.update(fields);
+    return assignedCase;
+}
+
+/**
  * Delete a single assigned case by UUID.
  */
 export async function deleteAssignedCase(id) {

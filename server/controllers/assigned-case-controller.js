@@ -106,3 +106,41 @@ export async function deleteAssignedCase(request, reply) {
         });
     }
 }
+/**
+ * PUT /api/v1/cases/:id
+ * Body: { status }
+ */
+export async function updateAssignedCase(request, reply) {
+    try {
+        const { id } = request.params;
+        const { status } = request.body;
+
+        if (!status) {
+            return reply.code(400).send({
+                success: false,
+                message: 'status is required',
+            });
+        }
+
+        const updatedCase = await assignedCaseService.updateAssignedCase(id, { status });
+
+        return reply.send({
+            success: true,
+            message: 'Case status updated successfully',
+            data: updatedCase,
+        });
+    } catch (error) {
+        if (error.message.includes('not found')) {
+            return reply.code(404).send({
+                success: false,
+                message: error.message,
+            });
+        }
+        request.log.error(error);
+        return reply.code(500).send({
+            success: false,
+            message: 'Failed to update case',
+            error: error.message,
+        });
+    }
+}
