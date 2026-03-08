@@ -19,6 +19,10 @@ COPY . .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+# Raise the Node.js heap limit to 1.5 GB so Vite can build on low-RAM servers
+# without hitting the default ~512 MB V8 heap cap and crashing mid-build.
+ENV NODE_OPTIONS="--max-old-space-size=1536"
+
 # Build the production React app
 RUN npm run build
 
