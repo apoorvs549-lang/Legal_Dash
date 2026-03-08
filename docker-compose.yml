@@ -12,7 +12,7 @@ services:
     environment:
       POSTGRES_DB: database_dash
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: apoorv123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
@@ -27,8 +27,8 @@ services:
   # SERVICE 2: Fastify Backend Server
   # ─────────────────────────────────────────────────
   backend:
-  #forget to add build thats why instead of building new code it was pointing to old pre-built version of github
-    build: ./server   
+    #forget to add build thats why instead of building new code it was pointing to old pre-built version of github
+    build: ./server
     image: ghcr.io/apoorvs549-lang/legal-dash-backend:latest
     container_name: reactdash_backend
     restart: always
@@ -37,12 +37,12 @@ services:
     environment:
       DB_NAME: database_dash
       DB_USER: postgres
-      DB_PASSWORD: apoorv123
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: db
       DB_PORT: 5432
       PORT: 3000
       HOST: 0.0.0.0
-      JWT_SECRET: super_secret_key_change_in_production_2026
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 7d
       CORS_ORIGIN: http://13.63.65.240
     volumes:
@@ -63,7 +63,11 @@ services:
   # SERVICE 3: React Frontend (Nginx)
   # ─────────────────────────────────────────────────
   frontend:
-    image: ghcr.io/apoorvs549-lang/legal-dash-frontend:latest
+    build:
+      context: .
+      args:
+        VITE_API_URL: http://13.63.65.240:3000
+    image: reactdash_frontend_local:latest
     container_name: reactdash_frontend
     restart: always
     ports:

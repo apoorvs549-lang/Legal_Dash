@@ -148,8 +148,8 @@ cd ~/reactdashboard
 docker-compose restart frontend
 docker exec -u root reactdash_frontend chmod -R 755 /usr/share/nginx/html
 
-# If backend changed (rebuilds the backend image):
-docker-compose up --build -d
+# If backend changed:
+./start.sh
 
 # Fix permissions after any rebuild:
 docker exec -u root reactdash_frontend chmod -R 755 /usr/share/nginx/html
@@ -195,11 +195,11 @@ docker logs reactdash_frontend --tail 50
 docker-compose restart backend
 docker-compose restart frontend
 
-# Full restart (stops and starts all containers)
-docker-compose down && docker-compose up -d
+# Full restart (stops and starts all containers using the secure secrets script)
+./start.sh
 
 # Full rebuild (use if you changed Dockerfiles)
-docker-compose down && docker-compose up --build -d
+./start.sh
 
 # Check memory usage
 free -h
@@ -284,7 +284,7 @@ Then **rebuild and redeploy** following Steps 2–5 in the Redeploying section a
 ```bash
 ssh -i "C:\Users\apoor\Downloads\apoorv.pem" ec2-user@13.63.65.240
 cd ~/reactdashboard
-docker-compose up -d
+./start.sh
 ```
 
 > If you set up an Elastic IP (above), the IP stays the same and your app is immediately back at **http://13.63.65.240** after starting containers.
